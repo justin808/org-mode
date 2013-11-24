@@ -96,17 +96,19 @@ This variable can be set to either `atx' or `setext'."
 
 
 ;;; Filters
-
 (defun org-md-separate-elements (tree backend info)
   "Make sure elements are separated by at least one blank line.
 
 TREE is the parse tree being exported.  BACKEND is the export
 back-end used.  INFO is a plist used as a communication channel.
 
+The following types do not get an extra separator: org-data,
+item, src-block, plain-list.
+
 Assume BACKEND is `md'."
   (org-element-map tree org-element-all-elements
     (lambda (elem)
-      (unless (eq (org-element-type elem) 'org-data)
+      (unless (memq (org-element-type elem) '(org-data item src-block plain-list))
 	(org-element-put-property
 	 elem :post-blank
 	 (let ((post-blank (org-element-property :post-blank elem)))
@@ -259,7 +261,6 @@ channel."
 
 
 ;;;; Link
-
 (defun org-md-link (link contents info)
   "Transcode LINE-BREAK object into Markdown format.
 CONTENTS is the link's description.  INFO is a plist used as
